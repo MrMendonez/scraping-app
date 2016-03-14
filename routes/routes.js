@@ -20,108 +20,20 @@ module.exports.routes = function(app) {
   app.get('/', controller.home);
 
   //New Note Creation
-  app.post("/submit", function(req, res){
-    var newNote = new Note({
-      noteBody: req.body.noteBody});
-    newNote.save(function(err, doc) {
-      if (err) {
-        res.send(err);
-      } else {
-        Article.findOneAndUpdate({
-          "_id": req.body.articleid},
-          {$push: {'notes': doc._id}}, {new: true}, function(err, articleData) {
-          if (err) {
-            console.log("articleData = " + articleData);
-            res.send(err);
-          } else {
-              console.log("articleData = " + articleData);
-              res.json(articleData);
-          }
-        });
-      }
-    });
-  });
+  app.post("/submit", controller.submit);
 
   //Route to see notes we have added
-  app.get('/notes', function(req, res) {
-    Note.find({}, function(err, doc) {
-      if (err) {
-        res.send(err);
-      } else {
-        res.send(doc);
-      }
-    });
-  });
-
-  //Route to see what user looks like without populating
-  app.get('/user', function(req, res) {
-    User.find({}, function(err, doc) {
-      if (err) {
-        res.send(err);
-      } else {
-        res.send(doc);
-      }
-    });
-  });
-
-  //Route to see what user looks like WITH populating
-  app.get('/populateduser', function(req, res) {
-
-  ////////////////////////////////////////////////
-  //WRITE YOUR CODE IN HERE
-  //RESPOND WITH THE POPULATED USER OBJECT
-    User.find({})
-      .populate('notes')
-      .exec(function(err, dbUsers) {
-        if(err) {
-          res.send(err);
-        }
-        else {
-          res.send(dbUsers);
-        }
-      })
-  ///////////////////////////////////////////////
-  });
-
-  // Scraping
-  //Get from DB
-  app.get('/illegal', function(req, res) {
-    db.insertedArticle.find({}, function(err, found) {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(found);
-      }
-    });
-  });
-
-
-// Moved scraper code to inside '/' route so it scrapes on page load
-  // app.get('/scrape', function(req, res) {
-    
-  //   res.redirect('/');
-  // });
+  app.get('/notes', controller.notes);
 
   // Display scraped data
-  app.get('/displayInfo', function(req, res) {
-    Article.find({}, function(err, articleData) {
-      if(err) {
-        throw err;
-      }
-      res.json(articleData);
-    }).limit(10);
-  });
-
-
-
+  app.get('/displayInfo', controller.displayInfo);
   
-  app.post('/addNote/:id' , function(req, res) {
+  // app.post('/addNote/:id' , function(req, res) {
        
-  });
+  // });
   
-  app.get('/delete/:id', function(req, res) {
+  // app.get('/delete/:id', function(req, res) {
       
-  });
+  // });
     
-    
-}
+};

@@ -46,6 +46,47 @@ exports.home = function(req, res, next) {
         });
       });
     });
-
     res.render('index');
-}
+};
+
+exports.submit = function(req, res, next) {
+  var newNote = new Note({
+    noteBody: req.body.noteBody
+  });
+  newNote.save(function(err, doc) {
+    if (err) {
+      res.send(err);
+    } else {
+      Article.findOneAndUpdate({
+        "_id": req.body.articleid},
+        {$push: {'notes': doc._id}}, {new: true}, function(err, articleData) {
+        if (err) {
+          console.log("articleData = " + articleData);
+          res.send(err);
+        } else {
+          console.log("articleData = " + articleData);
+          res.json(articleData);
+        }
+      });
+    }
+  });
+};
+
+exports.notes = function(req, res, next) {
+  Note.find({}, function(err, doc) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(doc);
+    }
+  });
+};
+
+exports.displayInfo = function(req, res, next) {
+  Article.find({}, function(err, articleData) {
+    if(err) {
+      throw err;
+    }
+    res.json(articleData);
+  }).limit(10);
+};
