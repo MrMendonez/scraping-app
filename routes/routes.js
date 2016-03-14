@@ -1,5 +1,4 @@
-
-// var renders = require('/controller/controller.js');
+var controller = require('../controllers/controller.js');
 
 module.exports.routes = function(app) {
 
@@ -18,42 +17,7 @@ module.exports.routes = function(app) {
   var Note = require('../models/Note.js');
   var Article = require('../models/Article.js');
 
-  app.get('/', function(req, res) {
-
-    request('https://news.ycombinator.com/', function(error, response, html) {
-      var $ = cheerio.load(html);
-      $('.title').each(function(i, element) {
-        var title = $(this).children('a').text();
-        var link = $(this).children('a').attr('href');
-        if (title && link) {
-          db.insertedArticle.save({
-            title: title,
-            link: link
-          }, function(err, saved) {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log(saved);
-            }
-          });
-        }
-        var insertedArticle = new Article({
-          title : title,
-          link: link
-        });
-        // Save to Database
-        insertedArticle.save(function(err, dbArticle) {
-          if (err) {
-            console.log(err);
-          } else {
-            // console.log(dbArticle);
-          }
-        });
-      });
-    });
-
-    res.render('index');
-  });
+  app.get('/', controller.home);
 
   //New Note Creation
   app.post("/submit", function(req, res){
@@ -67,8 +31,10 @@ module.exports.routes = function(app) {
           "_id": req.body.articleid},
           {$push: {'notes': doc._id}}, {new: true}, function(err, articleData) {
           if (err) {
+            console.log("articleData = " + articleData);
             res.send(err);
           } else {
+              console.log("articleData = " + articleData);
               res.json(articleData);
           }
         });
