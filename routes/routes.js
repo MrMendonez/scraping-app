@@ -9,7 +9,7 @@ module.exports.routes = function(app) {
   var db = mongoose.connection;
   var mongojs = require('mongojs');
   var databaseUrl = "scraper";
-  var collections = ["scrapedData"];
+  var collections = ["insertedArticle"];
   var db = mongojs(databaseUrl, collections);
   db.on('error', function(err) {
     console.log('Database Error:', err);
@@ -87,7 +87,7 @@ module.exports.routes = function(app) {
   // Scraping
   //Get from DB
   app.get('/illegal', function(req, res) {
-    db.scrapedData.find({}, function(err, found) {
+    db.insertedArticle.find({}, function(err, found) {
       if (err) {
         console.log(err);
       } else {
@@ -103,7 +103,7 @@ module.exports.routes = function(app) {
         var title = $(this).children('a').text();
         var link = $(this).children('a').attr('href');
         if (title && link) {
-          db.scrapedData.save({
+          db.insertedArticle.save({
             title: title,
             link: link
           }, function(err, saved) {
@@ -114,10 +114,6 @@ module.exports.routes = function(app) {
             }
           });
         }
-        var insertedArticle = new Article({
-          title : title,
-          link: link
-        });
         // Save to Database
         insertedArticle.save(function(err, dbArticle) {
           if (err) {

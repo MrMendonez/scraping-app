@@ -4,7 +4,7 @@ $(document).ready(function(){
       var newDiv = "<div class='col m8 offset-m2'>";
       newDiv += "<div class='article-box'>";
       newDiv += "<div class='article-title'>";
-      newDiv += "<h3>"+article.title+"</h3>";
+      newDiv += "<h3>" + article.title + "</h3>";
       newDiv += "</div>"; //close article-title
       newDiv += "<div class='article-link'>";
       newDiv += "<a href=" + article.link + ">" + "View Article" + "</a>";
@@ -25,7 +25,7 @@ $(document).ready(function(){
       newDiv += "</div>"; //col m4
 
       $("#db-info").append(newDiv);
-      
+
     });
   });
 });
