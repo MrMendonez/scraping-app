@@ -15,24 +15,28 @@ module.exports.routes = function(app) {
     console.log('Database Error:', err);
   });
 
+  var Note = require('../models/Note.js');
+  var Article = require('../models/Article.js');
+
   app.get('/', function(req, res) {
     res.render('index');
   });
 
   //New Note Creation
-  app.post('/submit', function(req, res) {
-    var newNote = new Note(req.body);
-    //Save the new note
+  app.post("/submit", function(req, res){
+    var newNote = new Note({
+      noteBody: req.body.noteBody});
     newNote.save(function(err, doc) {
       if (err) {
         res.send(err);
       } else {
-        //Find our user and push the new note id into the User's notes array
-        User.findOneAndUpdate({}, {$push: {'notes': doc._id}}, {new: true}, function(err, doc) {
+        Article.findOneAndUpdate({
+          "_id": req.body.articleid},
+          {$push: {'notes': doc._id}}, {new: true}, function(err, articleData) {
           if (err) {
             res.send(err);
           } else {
-            res.send(doc);
+              res.json(articleData);
           }
         });
       }
@@ -80,40 +84,62 @@ module.exports.routes = function(app) {
   ///////////////////////////////////////////////
   });
 
-// Scraping
-//Get from DB
-app.get('/illegal', function(req, res) {
-  db.scrapedData.find({}, function(err, found) {
-    if (err) {
-      console.log(err);
-    } else {
-      res.json(found);
-    }
-  });
-});
-
-app.get('/scrape', function(req, res) {
-  request('https://news.ycombinator.com/', function(error, response, html) {
-    var $ = cheerio.load(html);
-    $('.title').each(function(i, element) {
-      var title = $(this).children('a').text();
-      var link = $(this).children('a').attr('href');
-      if (title && link) {
-        db.scrapedData.save({
-          title: title,
-          link: link
-        }, function(err, saved) {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log(saved);
-          }
-        });
+  // Scraping
+  //Get from DB
+  app.get('/illegal', function(req, res) {
+    db.scrapedData.find({}, function(err, found) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json(found);
       }
     });
   });
-  res.send("Scrape Complete");
-});
+
+  app.get('/scrape', function(req, res) {
+    request('https://news.ycombinator.com/', function(error, response, html) {
+      var $ = cheerio.load(html);
+      $('.title').each(function(i, element) {
+        var title = $(this).children('a').text();
+        var link = $(this).children('a').attr('href');
+        if (title && link) {
+          db.scrapedData.save({
+            title: title,
+            link: link
+          }, function(err, saved) {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log(saved);
+            }
+          });
+        }
+        var insertedArticle = new Article({
+          title : title,
+          link: link
+        });
+        // Save to Database
+        insertedArticle.save(function(err, dbArticle) {
+          if (err) {
+            console.log(err);
+          } else {
+            // console.log(dbArticle);
+          }
+        });
+      });
+    });
+    res.send("Scrape Complete");
+  });
+
+  // Display scraped data
+  app.get('/displayInfo', function(req, res) {
+    Article.find({}, function(err, articleData) {
+      if(err) {
+        throw err;
+      }
+      res.json(articleData);
+    }).limit(10);
+  });
 
 
 
