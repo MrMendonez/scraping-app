@@ -6,13 +6,8 @@ module.exports.routes = function(app) {
   var cheerio = require('cheerio'); // scrapes - allows us to use jquery syntax to parse a lot of data
   var mongoose = require('mongoose');
   var db = mongoose.connection;
-  var mongojs = require('mongojs');
-  var databaseUrl = "scraper";
+  var databaseUrl = "scraping-app";
   var collections = ["insertedArticle"];
-  var db = mongojs(databaseUrl, collections);
-  db.on('error', function(err) {
-    console.log('Database Error:', err);
-  });
 
   var Note = require('../models/Note.js');
   var Article = require('../models/Article.js');
