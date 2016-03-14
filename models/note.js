@@ -4,6 +4,10 @@ var Schema = mongoose.Schema;
 var NoteSchema = new Schema({
   noteBody:{
     type:String
+  },
+  _articleId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Article'
   }
 });
 

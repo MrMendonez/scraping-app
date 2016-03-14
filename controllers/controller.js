@@ -17,9 +17,9 @@ db.on('error', function(err) {
 exports.home = function(req, res, next) {
   request('https://news.ycombinator.com/', function(error, response, html) {
     var $ = cheerio.load(html);
-    $('.title').each(function(i, element) {
-      var title = $(this).children('a').text();
-      var link = $(this).children('a').attr('href');
+    $('td.title:nth-child(3)>a').each(function(i, element) {
+      var title = $(element).text();
+      var link = $(element).attr('href');
       if (title && link) {
         db.insertedArticle.save({
           title: title,
@@ -81,10 +81,22 @@ exports.notes = function(req, res, next) {
 };
 
 exports.displayInfo = function(req, res, next) {
-  Article.find({}, function(err, articleData) {
+  Article.find({})
+    .populate('notes')
+    .exec(function(err, articleData) {
     if(err) {
       throw err;
     }
+    debugger;
     res.json(articleData);
-  }).limit(10);
+  });
 };
+
+exports.displayNotes = function(req, res, next) {
+  Note.find({}, function(err, noteData) {
+    if(err) {
+      throw err;
+    }
+    res.json(noteData);
+  });
+}

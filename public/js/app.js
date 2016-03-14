@@ -1,5 +1,6 @@
 $(document).ready(function(){
  $.getJSON("/displayInfo", function(response) {
+    debugger;
     response.forEach(function(article) {
       var newDiv = "<div class='col m8 offset-m2'>";
       newDiv += "<div class='article-box'>";
@@ -12,7 +13,7 @@ $(document).ready(function(){
       newDiv += "<div class='article-addNote'>";
       newDiv += "<p>" + 'Your Notes' + "</p>";
       newDiv += "<div class='article-showNote'>";
-      newDiv += "<div class='showNote'>" + "Article Note = " + article.notes + "</div>";
+      newDiv += "<div class='showNote'>" + "Article Note = " + article.notes.noteBody + "</div>";
       newDiv += "<form action='/submit' method='post'>"
         + "<input type='hidden' name='articleId' id='articleInput' value=" + article._id + ">"
         + "<textarea class='form-control' rows='3' name='noteBody'>"
@@ -29,3 +30,14 @@ $(document).ready(function(){
     });
   });
 });
+
+// $.getJSON("/displayNotes", function(response) {
+//   response.forEach(function(note) {
+//     var noteDiv = "<div class='article-showNote'>";
+//     noteDiv += "<div class='showNote'>"+note.noteBody+"</div>";
+//     noteDiv += "<button class='deleteNote btn'>"+"Delete"+"</button>";
+//     noteDiv += "</div>"; // close-article-showNote
+//   $(".article-box").append(noteDiv);
+
+//   });
+// });
