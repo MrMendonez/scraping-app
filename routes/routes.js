@@ -19,6 +19,39 @@ module.exports.routes = function(app) {
   var Article = require('../models/Article.js');
 
   app.get('/', function(req, res) {
+
+    request('https://news.ycombinator.com/', function(error, response, html) {
+      var $ = cheerio.load(html);
+      $('.title').each(function(i, element) {
+        var title = $(this).children('a').text();
+        var link = $(this).children('a').attr('href');
+        if (title && link) {
+          db.insertedArticle.save({
+            title: title,
+            link: link
+          }, function(err, saved) {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log(saved);
+            }
+          });
+        }
+        var insertedArticle = new Article({
+          title : title,
+          link: link
+        });
+        // Save to Database
+        insertedArticle.save(function(err, dbArticle) {
+          if (err) {
+            console.log(err);
+          } else {
+            // console.log(dbArticle);
+          }
+        });
+      });
+    });
+
     res.render('index');
   });
 
@@ -96,36 +129,12 @@ module.exports.routes = function(app) {
     });
   });
 
-  app.get('/scrape', function(req, res) {
-    request('https://news.ycombinator.com/', function(error, response, html) {
-      var $ = cheerio.load(html);
-      $('.title').each(function(i, element) {
-        var title = $(this).children('a').text();
-        var link = $(this).children('a').attr('href');
-        if (title && link) {
-          db.insertedArticle.save({
-            title: title,
-            link: link
-          }, function(err, saved) {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log(saved);
-            }
-          });
-        }
-        // Save to Database
-        insertedArticle.save(function(err, dbArticle) {
-          if (err) {
-            console.log(err);
-          } else {
-            // console.log(dbArticle);
-          }
-        });
-      });
-    });
-    res.send("Scrape Complete");
-  });
+
+// Moved scraper code to inside '/' route so it scrapes on page load
+  // app.get('/scrape', function(req, res) {
+    
+  //   res.redirect('/');
+  // });
 
   // Display scraped data
   app.get('/displayInfo', function(req, res) {
