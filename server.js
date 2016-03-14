@@ -52,21 +52,7 @@ db.on('error', function(err) {
 
 //Require Schemas
 var Note = require('./models/Note.js');
-var User = require('./models/User.js');
 var Article = require('./models/Article.js');
-
-//adding a user to use in the example
-//"unique:true" in schema will prevent duplicates from restarting server
-var exampleUser = new User({
-  name: "Ernest Hemingway"
-});
-exampleUser.save(function(err, doc) {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log(doc);
-  }
-});
 
 app.listen(PORT, function(){
   console.log("Server listening at " + PORT);

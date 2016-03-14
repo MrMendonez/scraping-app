@@ -7,18 +7,18 @@ $(document).ready(function(){
       newDiv += "<h3>" + article.title + "</h3>";
       newDiv += "</div>"; //close article-title
       newDiv += "<div class='article-link'>";
-      newDiv += "<a href=" + article.link + ">" + "View Article" + "</a>";
+      newDiv += "<a href=" + article.link + " target='_blank'>" + "View Article" + "</a>";
       newDiv += "</div>"; //close article-link
       newDiv += "<div class='article-addNote'>";
-      newDiv += "<p>"+'Your Notes'+"</p>";
+      newDiv += "<p>" + 'Your Notes' + "</p>";
+      newDiv += "<div class='article-showNote'>";
+      newDiv += "<div class='showNote'>" + "Article Note = " + article.notes + "</div>";
       newDiv += "<form action='/submit' method='post'>"
         + "<input type='hidden' name='articleId' id='articleInput' value=" + article._id + ">"
         + "<textarea class='form-control' rows='3' name='noteBody'>"
         + "Write Note Here</textarea></br>"
-        + "<input type='submit' class='btn btn-default'></form>";
-      newDiv += "<div class='article-showNote'>";
-      newDiv += "<div class='showNote'>"+article.notes+"</div>";
-      newDiv += "<button class='deleteNote btn'>"+"Delete"+"</button>";
+        + "<input type='submit' class='btn btn-default'>";
+      newDiv += "<button class='deleteNote btn'>" + "Delete" + "</button></form>";
       newDiv += "</div>"; // close-article-showNote
       newDiv += "</div>"; // close-article-addNote
       newDiv += "</div>"; //close-article-box
