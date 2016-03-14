@@ -3,6 +3,18 @@
 
 module.exports.routes = function(app) {
 
+  var request = require('request'); // gives us the ability to make web requests
+  var cheerio = require('cheerio'); // scrapes - allows us to use jquery syntax to parse a lot of data
+  var mongoose = require('mongoose');
+  var db = mongoose.connection;
+  var mongojs = require('mongojs');
+  var databaseUrl = "scraper";
+  var collections = ["scrapedData"];
+  var db = mongojs(databaseUrl, collections);
+  db.on('error', function(err) {
+    console.log('Database Error:', err);
+  });
+
   app.get('/', function(req, res) {
     res.render('index');
   });
@@ -68,17 +80,43 @@ module.exports.routes = function(app) {
   ///////////////////////////////////////////////
   });
 
-
-
-
-
-
-
-
-    
-  app.get('/scrape', function(req, res) {
-       
+// Scraping
+//Get from DB
+app.get('/illegal', function(req, res) {
+  db.scrapedData.find({}, function(err, found) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(found);
+    }
   });
+});
+
+app.get('/scrape', function(req, res) {
+  request('https://news.ycombinator.com/', function(error, response, html) {
+    var $ = cheerio.load(html);
+    $('.title').each(function(i, element) {
+      var title = $(this).children('a').text();
+      var link = $(this).children('a').attr('href');
+      if (title && link) {
+        db.scrapedData.save({
+          title: title,
+          link: link
+        }, function(err, saved) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(saved);
+          }
+        });
+      }
+    });
+  });
+  res.send("Scrape Complete");
+});
+
+
+
   
   app.post('/addNote/:id' , function(req, res) {
        

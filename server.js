@@ -42,6 +42,14 @@ db.once('open', function() {
   console.log('Mongoose connection successful.');
 });
 
+var mongojs = require('mongojs');
+var databaseUrl = "scraper";
+var collections = ["scrapedData"];
+var db = mongojs(databaseUrl, collections);
+db.on('error', function(err) {
+  console.log('Database Error:', err);
+});
+
 //Require Schemas
 var Note = require('./models/Note.js');
 var User = require('./models/User.js');
@@ -58,6 +66,9 @@ exampleUser.save(function(err, doc) {
     console.log(doc);
   }
 });
+
+
+
 
 
 app.listen(PORT, function(){
