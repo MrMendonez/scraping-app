@@ -1,42 +1,79 @@
 $(document).ready(function(){
- $.getJSON("/displayInfo", function(response) {
-    response.forEach(function(article) {
-      var newDiv = "<div class='col m8 offset-m2'>";
-      newDiv += "<div class='article-box'>";
-      newDiv += "<div class='article-title'>";
-      newDiv += "<h3>" + article.title + "</h3>";
-      newDiv += "</div>"; //close article-title
-      newDiv += "<div class='article-link'>";
-      newDiv += "<a href=" + article.link + " target='_blank'>" + "View Article" + "</a>";
-      newDiv += "</div>"; //close article-link
-      newDiv += "<div class='article-addNote'>";
-      newDiv += "<p>" + 'Your Notes' + "</p>";
-      newDiv += "<div class='article-showNote'>";
-      newDiv += "<div class='showNote'>" + "Article Note = " + article.notes.noteBody + "</div>";
-      newDiv += "<form action='/submit' method='post'>"
-        + "<input type='hidden' name='articleId' id='articleInput' value=" + article._id + ">"
-        + "<textarea class='form-control' rows='3' name='noteBody'>"
-        + "Write Note Here</textarea></br>"
-        + "<input type='submit' class='btn btn-default'>";
-      newDiv += "<button class='deleteNote btn'>" + "Delete" + "</button></form>";
-      newDiv += "</div>"; // close-article-showNote
-      newDiv += "</div>"; // close-article-addNote
-      newDiv += "</div>"; //close-article-box
-      newDiv += "</div>"; //col m4
 
-      $("#db-info").append(newDiv);
+  function getScrapedData() {
+    $('#scrape-results').empty();
+    $.getJSON('/scrape', function(data) {
+      for(var = i; i < data.length; i++) {
+        $('#scrape-results').prepend('<li class = "collection-item dismissable" data-id=' + data[i]._id + '><div><a href="' + data[i].link + '"target="_blank">' + data[i].title + '</a>' + '<a href="#!" class="secondary-content"><i class="material-icons show-note">send</i></a></div></li>');
+      }
+    })
+  }
 
-    });
+  getScrapedData();
+
+  function getNotes(id) {
+    $.ajax({
+      type: "POST",
+      url: '/getNotes',
+      dataType: 'json',
+      data: {
+        scrapeId: id
+      }
+    })
+    .done(function(data) {
+      console.log(data.notes);
+      var notes = data.notes;
+      $('#note-results').empty();
+      for(var i = 0; i < notes.length; i++) {
+        $('#note-results').prepend('<li class="collection-item dismissable" data-id=' + notes[i]._id + ' data-scrapeid=' + id + '><div>' + notes[i].note + '<a href="#"><i class="material-icons delete-note">not_interested</i></a></div></li>')
+      }
+    })
+  };
+
+  $('#new-note').on('click', function(e) {
+    e.preventDefault();
+    var scrapeId = $('#note-text').data('id');
+    $.ajax({
+      type: 'POST',
+      url: '/addNote',
+      dataType: 'json',
+      data: {
+        note: $('#note-text').val(),
+        createdAt: Date.now(),
+        scrapeId: scrapeId
+      }
+    })
+    .done(function(data) {
+      console.log('got here');
+      getNotes(scrapeId);
+
+    })
   });
+
+  $(document).on('click', 'show-note', function(e) {
+    var objID = $(this).parents('li').data('id');
+    $('#note-text').data('id', objID);
+    // get json notes for the scraped data entry
+    getNotes(objID);
+  });
+
+  $(document).on('click', '.delete-note', function(e) {
+    var objID = $(this).parents('li').data('id');
+    var scrapeId = $(this).parents('li').data('scrapeId');
+    var note = $(this).parents('li');
+    // get json notes for the scraped data entry
+    $.ajax({
+      type: 'POST',
+      url: '/delete/',
+      dataType: 'json',
+      data: {
+        noteId: objID,
+        scrapeId: scrapeId
+      }
+    })
+    .done(function(data) {
+      note.remove();
+    })
+  });
+
 });
-
-// $.getJSON("/displayNotes", function(response) {
-//   response.forEach(function(note) {
-//     var noteDiv = "<div class='article-showNote'>";
-//     noteDiv += "<div class='showNote'>"+note.noteBody+"</div>";
-//     noteDiv += "<button class='deleteNote btn'>"+"Delete"+"</button>";
-//     noteDiv += "</div>"; // close-article-showNote
-//   $(".article-box").append(noteDiv);
-
-//   });
-// });
