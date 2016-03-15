@@ -1,6 +1,5 @@
 $(document).ready(function(){
  $.getJSON("/displayInfo", function(response) {
-    debugger;
     response.forEach(function(article) {
       var newDiv = "<div class='col m8 offset-m2'>";
       newDiv += "<div class='article-box'>";

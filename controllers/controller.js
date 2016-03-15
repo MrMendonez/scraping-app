@@ -1,102 +1,40 @@
 //Require Schemas
-var Note = require('../models/Note.js');
-var Article = require('../models/Article.js');
-
-var request = require('request'); // gives us the ability to make web requests
-var cheerio = require('cheerio'); // scrapes - allows us to use jquery syntax to parse a lot of data
-var mongoose = require('mongoose');
-var db = mongoose.connection;
-var mongojs = require('mongojs');
-var databaseUrl = "scraping-app";
-var collections = ["insertedArticle"];
-var db = mongojs(databaseUrl, collections);
-db.on('error', function(err) {
-  console.log('Database Error:', err);
-});
+var scrape = require('../models/scrapedModel.js');
+var Note = require('../models/noteModel.js');
 
 exports.home = function(req, res, next) {
-  request('https://news.ycombinator.com/', function(error, response, html) {
-    var $ = cheerio.load(html);
-    $('td.title:nth-child(3)>a').each(function(i, element) {
-      var title = $(element).text();
-      var link = $(element).attr('href');
-      if (title && link) {
-        db.insertedArticle.save({
-          title: title,
-          link: link
-        }, function(err, saved) {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log(saved);
-          }
-        });
-      }
-      var insertedArticle = new Article({
-        title : title,
-        link: link
-      });
-      // Save to Database
-      insertedArticle.save(function(err, dbArticle) {
-        if (err) {
-          console.log(err);
-        } else {
-          // console.log(dbArticle);
-        }
-      });
-    });
-  });
-  res.render('index');
+  scrape.scraper();
+  res.render('home');
 };
 
-exports.submit = function(req, res, next) {
-  var newNote = new Note({
-    noteBody: req.body.noteBody
-  });
-  newNote.save(function(err, doc) {
-    if (err) {
-      res.send("Error: " + err);
-    } else {
-      Article.findOneAndUpdate({
-        "_id": req.body.articleid},
-        {$push: {'notes': doc._id}}, {new: true}, function(err, articleData) {
-        if (err) {
-          res.send("An error has occured: " + err);
-        } else {
-          res.json("articleData saved successfully: " + articleData);
-        }
-      });
-    }
-  });
-};
-
-exports.notes = function(req, res, next) {
-  Note.find({}, function(err, doc) {
-    if (err) {
-      res.send("notes error: " + err);
-    } else {
-      res.send(doc);
-    }
-  });
-};
-
-exports.displayInfo = function(req, res, next) {
-  Article.find({})
-    .populate('notes')
-    .exec(function(err, articleData) {
+exports.addNote = function(req, res, next) {
+  var newNote = new Note.Note({
+    note: req.body.note,
+    createdAt: req.body.createdAt
+  })
+  newNote.save(function(err, newNote) {
     if(err) {
       throw err;
     }
-    debugger;
-    res.json(articleData);
-  });
+    scrape.updateScrapeNote(req.body.scrapeId, newNote);
+    res.send({});
+  })
 };
 
-exports.displayNotes = function(req, res, next) {
-  Note.find({}, function(err, noteData) {
-    if(err) {
-      throw err;
-    }
-    res.json(noteData);
-  });
-}
+exports.getNotes = function(req, res, next) {
+  scrape.getAllNotes(req.body.scrapeId).then(function(scrapeWithNotes) {
+    res.json(scrapeWithNotes);
+  })
+};
+
+exports.scrapeData = function(req, res, next) {
+  scrape.getScrapedData().then(function(data) {
+    res.json(data);
+  })
+};
+
+exports.deleteNote = function(req, res, next) {
+  Note.deleteNote(req.body.noteId).then(function() {
+    res.send({});
+  })
+};
