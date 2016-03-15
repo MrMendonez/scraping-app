@@ -1,4 +1,4 @@
-var request = require('require');
+var request = require('request');
 var cheerio = require('cheerio');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
@@ -18,24 +18,26 @@ var ScrapedDataSchema = new Schema({
 });
 
 var scraper = function() {
-  request('https://news.ycombinator.com/'), function(error, response, html) {
+  request('https://news.ycombinator.com/', function (error, response, html) {
     var $ = cheerio.load(html);
-    $('td.title:nth-child(3)>a').each(function(i, element) {
+    $('td.title:nth-child(3)>a').each(function(i, element){
+
       var scraped = new ScrapedData({
         title: $(element).text(),
         link: $(element).attr('href')
-      })
+      });
+
       scraped.save(function(err, doc) {
-        if(err) {
+        if (err) {
           console.log(err);
-        }
-        else {
+        } else {
           console.log(doc);
-        }
-      })
-    })
-  }
-};
+        };
+      });
+    });
+  });
+}
+
 
 var getScrapedData = function() {
   return ScrapedData.find({});

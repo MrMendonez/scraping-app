@@ -4,7 +4,7 @@ module.exports.routes = function(app) {
 
   app.get('/', controller.home);
 
-  app.get("/scrape", controller.scrapeData);
+  app.get('/scrape', controller.scrapeData);
 
   app.post('/getNotes', controller.getNotes);
 

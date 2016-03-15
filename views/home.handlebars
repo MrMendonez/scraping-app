@@ -1,0 +1,29 @@
+<div class="container">
+  <div class="row">
+    <div class="col m3 input-note center">
+      <h5>Enter a note here</h5>
+      <div class="input-field">
+        <form method="post" action="/addNote">
+          <textarea id="note-text" class="materialize-textarea" name="note" data-id=""></textarea>
+          <label for="note-text">Textarea</label>
+          <button class="btn waves-effect waves-light" type="submit" name="action" id="new-note">New Note
+            <i class="material-icons right">send</i>
+          </button>
+        </form>
+      </div>
+      
+    </div>
+    <div class="col m6 scraped center">
+      <h5>Headlines</h5>
+      <ul class="collection" id="scrape-results">
+        
+      </ul>
+    </div>
+    <div class="col m3 notes center">
+      <h5>Your notes for this headline</h5>
+      <ul class="collection" id="note-results">
+        
+      </ul>
+    </div>
+  </div>
+</div>

@@ -3,7 +3,7 @@ $(document).ready(function(){
   function getScrapedData() {
     $('#scrape-results').empty();
     $.getJSON('/scrape', function(data) {
-      for(var = i; i < data.length; i++) {
+      for(var i = 0; i < data.length; i++) {
         $('#scrape-results').prepend('<li class = "collection-item dismissable" data-id=' + data[i]._id + '><div><a href="' + data[i].link + '"target="_blank">' + data[i].title + '</a>' + '<a href="#!" class="secondary-content"><i class="material-icons show-note">send</i></a></div></li>');
       }
     })
