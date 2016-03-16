@@ -6,7 +6,6 @@ var mongoose = require('mongoose');
 var request = require('request'); // gives us the ability to make web requests
 var logger = require('morgan'); // logs activity in the terminal
 
-
 //Database configuration
 mongoose.connect('mongodb://localhost/scraping-app');
 var db = mongoose.connection;

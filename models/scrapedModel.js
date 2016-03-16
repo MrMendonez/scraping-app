@@ -38,12 +38,12 @@ var scraper = function() {
   });
 }
 
-
 var getScrapedData = function() {
   return ScrapedData.find({});
 }
 
 var updateScrapeNote = function(scrapeId, newNote) {
+  console.log("updateScrapeNote is running...")
   ScrapedData.findOneAndUpdate({
     _id: scrapeId
   },
